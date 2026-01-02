@@ -47,7 +47,7 @@ jobs:
           if git rev-parse "v$VERSION" >/dev/null 2>&1; then
             echo "Tag v$VERSION already exists, skipping version bump"
           else
-            npm version patch -m "chore(release): %s"
+            npm version patch -m "chore(release): %s" --force
           fi
 
       - name: Push version commit and tag
