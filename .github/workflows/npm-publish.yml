@@ -44,7 +44,7 @@ jobs:
       - name: Bump patch version
         run: |
           git fetch --tags  # Ensure you have the latest tags
-          npm version patch -m "chore(release): %s"
+          npm version patch --alow-same-version -m "chore(release): %s"
 
       # Push the commit and new tag
       - name: Push version commit and tag
