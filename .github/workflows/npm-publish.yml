@@ -5,7 +5,10 @@ on:
     branches:
       - main
   workflow_dispatch:
-
+    inputs:
+      otp_number:
+        description: 'OTP'
+        required: true
 jobs:
   release:
     if: >
@@ -48,6 +51,6 @@ jobs:
         run: git push --follow-tags
 
       - name: Publish to npm
-        run: npm publish
+        run: npm publish --otp=${{ inputs.otp_number }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
