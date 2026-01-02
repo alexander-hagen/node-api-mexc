@@ -2,10 +2,10 @@ name: Publish to npmjs
 
 on:
   workflow_dispatch:
-    inputs:
-      otp_number:
-        description: 'OTP'
-        required: true
+#    inputs:
+#      otp_number:
+#        description: 'OTP'
+#        required: true
 
 jobs:
   release:
@@ -49,6 +49,7 @@ jobs:
         run: git push --follow-tags
 
       - name: Publish to npm
-        run: npm publish --otp=${{ inputs.otp_number }}
+        run: npm publish
+#        run: npm publish --otp=${{ inputs.otp_number }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
