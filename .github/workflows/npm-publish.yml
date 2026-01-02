@@ -8,24 +8,23 @@ on:
 
 jobs:
   release:
+    # Prevent infinite loop when the workflow pushes a release commit
     if: github.actor != 'github-actions[bot]'
-    runs-on: ubuntu-latest
-
-  jobs:
-
     runs-on: ubuntu-latest
 
     permissions:
       contents: write
 
     steps:
-      # Checkout the repository
-      - uses: actions/checkout@v4
+      # Checkout full history + tags
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # Setup Node.js
-      - uses: actions/setup-node@v4
+      # Setup Node.js and npm auth
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org/
@@ -35,24 +34,28 @@ jobs:
         run: npm ci
 
       # Run tests
-      - name: Perform tests
+      - name: Run tests
         run: npm test
         env:
           MY_API_KEY: ${{ secrets.my_api_key }}
           MY_API_SECRET: ${{ secrets.my_api_secret }}
 
-      # Configure git for commit and tag
+      # Configure git for committing
       - name: Configure git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      # Bump the version to the next patch version
+      # Bump patch version (creates commit + tag)
       - name: Bump patch version
-        run: |
-          git fetch --tags  # Ensure you have the latest tags
-          npm version patch -m "chore(release): %s"
+        run: npm version patch -m "chore(release): %s"
 
-      # Push the commit and new tag
+      # Push commit and tag
       - name: Push version commit and tag
         run: git push --follow-tags
+
+      # Publish to npm
+      - name: Publish to npm
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
