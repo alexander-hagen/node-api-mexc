@@ -6,6 +6,7 @@ on:
       otp_number:
         description: 'OTP'
         required: true
+
 jobs:
   release:
     if: >
