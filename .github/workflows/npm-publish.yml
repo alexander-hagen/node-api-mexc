@@ -7,70 +7,43 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
 
     permissions:
       contents: write
 
     steps:
+      # Checkout the repository
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Perform tests
-        run: npm test
-        env:
-          MY_API_KEY: ${{secrets.my_api_key}}
-          MY_API_SECRET: ${{secrets.my_api_secret}} 
-
-  patch:
-    needs: build
-    runs-on: ubuntu-latest
-
-    permissions:
-      contents: write
-
-    steps:
-      - uses: actions/checkout@v4
+      # Setup Node.js
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org/
 
+      # Install dependencies
       - name: Install dependencies
         run: npm ci
 
+      # Run tests
+      - name: Perform tests
+        run: npm test
+        env:
+          MY_API_KEY: ${{ secrets.my_api_key }}
+          MY_API_SECRET: ${{ secrets.my_api_secret }}
+
+      # Configure git for commit and tag
       - name: Configure git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+      # Bump the version to the next patch version
       - name: Bump patch version
         run: npm version patch -m "chore(release): %s"
 
+      # Push the commit and new tag
       - name: Push version commit and tag
-        run: git push --follow-tags
-        
-  publish:
-    needs: patch
-    runs-on: ubuntu-latest
-
-    permissions:
-      contents: write
-
-    steps:
-        uses: actions/checkout@v4
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          registry-url: https://registry.npmjs.org/
-
-      - name: Publish to npm
-        run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: git push --follow-t
