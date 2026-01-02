@@ -8,6 +8,11 @@ on:
 
 jobs:
   release:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+  jobs:
+
     runs-on: ubuntu-latest
 
     permissions:
