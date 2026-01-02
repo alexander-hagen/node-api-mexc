@@ -1,6 +1,6 @@
 {
   "name": "node-api-mexc",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Non-official implementation of Mexc's API's",
   "main": "index.js",
   "jest": {
