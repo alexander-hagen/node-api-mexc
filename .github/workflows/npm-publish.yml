@@ -50,4 +50,4 @@ jobs:
 
       # Push the commit and new tag
       - name: Push version commit and tag
-        run: git push --follow-t
+        run: git push --follow-tags
