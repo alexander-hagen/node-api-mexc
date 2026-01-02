@@ -42,7 +42,13 @@ jobs:
 
       - name: Bump patch version
         run: |
-          npm version patch -m "chore(release): %s"
+          git fetch --tags
+          VERSION=$(npm version patch --no-git-tag-version)
+          if git rev-parse "v$VERSION" >/dev/null 2>&1; then
+            echo "Tag v$VERSION already exists, skipping version bump"
+          else
+            npm version patch -m "chore(release): %s"
+          fi
 
       - name: Push version commit and tag
         run: git push --follow-tags
