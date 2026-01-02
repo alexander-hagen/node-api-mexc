@@ -8,29 +8,27 @@ on:
 
 jobs:
   release:
-    if: github.actor != 'github-actions[bot]'
+    if: >
+      github.actor != 'github-actions[bot]' &&
+      github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
 
     permissions:
       contents: write
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org/
 
-      - name: Install dependencies
-        run: npm ci
+      - run: npm ci
 
-      - name: Run tests
-        run: npm test
+      - run: npm test
         env:
           MY_API_KEY: ${{ secrets.my_api_key }}
           MY_API_SECRET: ${{ secrets.my_api_secret }}
@@ -43,12 +41,8 @@ jobs:
       - name: Bump patch version
         run: |
           git fetch --tags
-          VERSION=$(npm version patch --no-git-tag-version)
-          if git rev-parse "v$VERSION" >/dev/null 2>&1; then
-            echo "Tag v$VERSION already exists, skipping version bump"
-          else
-            npm version patch -m "chore(release): %s" --force
-          fi
+          NEW_VERSION=$(npm version patch -m "chore(release): %s")
+          echo "Released $NEW_VERSION"
 
       - name: Push version commit and tag
         run: git push --follow-tags
